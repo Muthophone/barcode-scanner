@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Barcode Scanner & Generator</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    #reader {
+      width: 300px;
+      margin: auto;
+      margin-bottom: 20px;
+    }
+    #result {
+      margin-top: 10px;
+      font-size: 20px;
+      color: green;
+    }
+    .section {
+      margin-top: 30px;
+    }
+    input {
+      padding: 10px;
+      width: 200px;
+    }
+    button {
+      padding: 10px 20px;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>বারকোড স্ক্যানার</h2>
+  <div id="reader"></div>
+  <div id="result">বারকোড স্ক্যান করুন...</div>
+
+  <div class="section">
+    <h2>বারকোড জেনারেটর</h2>
+    <input type="text" id="barcodeInput" placeholder="প্রোডাক্ট কোড দিন">
+    <button onclick="generateBarcode()">জেনারেট করুন</button>
+    <br><br>
+    <svg id="barcode"></svg>
+  </div>
+
+  <script>
+    const products = {
+      "123456789012": 15000,
+      "987654321098": 40000,
+      "111122223333": 12000
+    };
+
+    function showPrice(barcode) {
+      const price = products[barcode];
+      document.getElementById("result").innerText =
+        price ? `পারচেজ প্রাইস: ৳${price}` : "পণ্য খুঁজে পাওয়া যায়নি।";
+    }
+
+    const html5QrCode = new Html5Qrcode("reader");
+    html5QrCode.start(
+      { facingMode: "environment" },
+      {
+        fps: 10,
+        qrbox: { width: 250, height: 250 }
+      },
+      (decodedText) => {
+        showPrice(decodedText);
+      },
+      (errorMessage) => {}
+    ).catch(err => {
+      document.getElementById("result").innerText = "ক্যামেরা চালু করা যায়নি: " + err;
+    });
+
+    function generateBarcode() {
+      const input = document.getElementById("barcodeInput").value;
+      if (input) {
+        JsBarcode("#barcode", input, {
+          format: "CODE128",
+          lineColor: "#000",
+          width: 2,
+          height: 60,
+          displayValue: true
+        });
+      }
+    }
+  </script>
+</body>
+</html>
